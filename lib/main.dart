@@ -11,23 +11,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        ),
-        home: const MyHomePage(),
+      create: (context) => ThemeNotifier(),
+      child: Consumer<ThemeNotifier>(
+        builder: (context, themeNotifier, child) {
+          return MaterialApp(
+            title: 'Entre Planner',
+            theme:
+                themeNotifier.isDarkMode ? ThemeData.dark() : ThemeData.light(),
+            home: const MyHomePage(),
+          );
+        },
       ),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var todoitems = [];
+class ThemeNotifier extends ChangeNotifier {
+  bool _isDarkMode = false;
 
-  void todo() {
+  bool get isDarkMode => _isDarkMode;
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
     notifyListeners();
   }
 }
@@ -107,20 +111,38 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 10),
-          Row(
+          const SizedBox(height: 10),
+          Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Welcome Back, Maddy!',
+              const Text('Welcome Back!',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Container(
+                padding: const EdgeInsets.all(6.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    themeNotifier.toggleTheme();
+                  },
+                  child: themeNotifier.isDarkMode
+                      ? const Icon(Icons.dark_mode)
+                      : const Icon(Icons.sunny),
+                ),
+              ),
             ],
           ),
         ],
