@@ -137,22 +137,72 @@ class ToDoPage extends StatefulWidget {
 }
 
 class _ToDoPageState extends State<ToDoPage> {
+  final List<Map<String, dynamic>> _toDoItems = [];
   final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-
     return Column(
       children: [
-        TextField(
-          controller: _controller,
-          decoration: const InputDecoration(
-            labelText: 'Enter a To-Do Item',
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              labelText: 'Enter a To-Do Item',
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: _addToDoItem,
+          child: const Text('Add'),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _toDoItems.length,
+            itemBuilder: (context, index) {
+              final item = _toDoItems[index];
+              return ListTile(
+                title: Text('${index + 1}: ${item['text']}'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.warning_rounded),
+                      color: item['urgent'] ? Colors.red : null,
+                      onPressed: () {
+                        setState(() {
+                          _toDoItems.removeAt(index);
+                          _toDoItems.insert(
+                              0, {'text': item['text'], 'urgent': true});
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          _toDoItems.removeAt(index);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
     );
+  }
+
+  void _addToDoItem() {
+    if (_controller.text.isNotEmpty) {
+      setState(() {
+        _toDoItems.add({'text': _controller.text, 'urgent': false});
+        _controller.clear();
+      });
+    }
   }
 }
 
