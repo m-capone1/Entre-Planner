@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               'Entre-Planner',
-              style: GoogleFonts.montserrat(
+              style: GoogleFonts.raleway(
                 textStyle: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -177,6 +177,7 @@ class ToDoPage extends StatefulWidget {
 class _ToDoPageState extends State<ToDoPage> {
   final List<Map<String, dynamic>> _toDoItems = [];
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _date = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -184,11 +185,26 @@ class _ToDoPageState extends State<ToDoPage> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              labelText: 'Enter a To-Do Item',
-            ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter a To-Do Item',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: TextField(
+                  controller: _date,
+                  decoration: const InputDecoration(
+                    labelText: 'Enter a Due Date',
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         ElevatedButton(
@@ -202,6 +218,7 @@ class _ToDoPageState extends State<ToDoPage> {
               final item = _toDoItems[index];
               return ListTile(
                 title: Text('${index + 1}: ${item['text']}'),
+                subtitle: Text('Due Date: ${item['date']}'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -211,8 +228,11 @@ class _ToDoPageState extends State<ToDoPage> {
                       onPressed: () {
                         setState(() {
                           _toDoItems.removeAt(index);
-                          _toDoItems.insert(
-                              0, {'text': item['text'], 'urgent': true});
+                          _toDoItems.insert(0, {
+                            'text': item['text'],
+                            'date': item['date'],
+                            'urgent': true
+                          });
                         });
                       },
                     ),
@@ -235,10 +255,12 @@ class _ToDoPageState extends State<ToDoPage> {
   }
 
   void _addToDoItem() {
-    if (_controller.text.isNotEmpty) {
+    if (_controller.text.isNotEmpty && _date.text.isNotEmpty) {
       setState(() {
-        _toDoItems.add({'text': _controller.text, 'urgent': false});
+        _toDoItems.add(
+            {'text': _controller.text, 'date': _date.text, 'urgent': false});
         _controller.clear();
+        _date.clear();
       });
     }
   }
