@@ -266,14 +266,83 @@ class _ToDoPageState extends State<ToDoPage> {
   }
 }
 
-class FinancialPage extends StatelessWidget {
+class FinancialPage extends StatefulWidget {
   const FinancialPage({super.key});
 
   @override
+  State<FinancialPage> createState() => _FinancialPageState();
+}
+
+class _FinancialPageState extends State<FinancialPage> {
+  final TextEditingController _income = TextEditingController();
+  final TextEditingController _expenses = TextEditingController();
+
+  final List<double> _incomeItems = <double>[]; // Store numeric values
+  final List<double> _expensesItems = <double>[];
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const [],
+    return Column(
+      children: [
+        const Text('Income'),
+        _buildRow(
+          label: 'Enter Income',
+          controller: _income,
+          onPressed: _addIncome,
+        ),
+        const Text('Expenses'),
+        _buildRow(
+          label: 'Enter Expenses',
+          controller: _expenses,
+          onPressed: _addExpenses,
+        ),
+        const SizedBox(height: 20),
+        const Text('Net Profit'),
+        Text(
+          _calcNetProfit().toStringAsFixed(2),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        )
+      ],
     );
+  }
+
+  Widget _buildRow({
+    required String label,
+    required TextEditingController controller,
+    required VoidCallback onPressed,
+  }) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: onPressed,
+          icon: const Icon(Icons.add),
+        ),
+      ],
+    );
+  }
+
+  void _addIncome() {
+    if (_income.text.isNotEmpty) {
+      setState(() {
+        _incomeItems.add(double.parse(_income.text));
+        _income.clear();
+      });
+    }
+  }
+
+  void _addExpenses() {
+    if (_expenses.text.isNotEmpty) {
+      setState(() {
+        _expensesItems.add(double.parse(_expenses.text));
+        _income.clear();
+      });
+    }
+  }
+
+  _calcNetProfit() {
+    final totalIncome = _incomeItems.fold(0.0, (sum, item) => sum + item);
+    final totalExpenses = _expensesItems.fold(0.0, (sum, item) => sum + item);
+    return totalIncome - totalExpenses;
   }
 }
 
