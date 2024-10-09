@@ -277,7 +277,7 @@ class _FinancialPageState extends State<FinancialPage> {
   final TextEditingController _income = TextEditingController();
   final TextEditingController _expenses = TextEditingController();
 
-  final List<double> _incomeItems = <double>[]; // Store numeric values
+  final List<double> _incomeItems = <double>[];
   final List<double> _expensesItems = <double>[];
 
   @override
@@ -310,13 +310,34 @@ class _FinancialPageState extends State<FinancialPage> {
     required String label,
     required TextEditingController controller,
     required VoidCallback onPressed,
+    required List<double> itemList,
   }) {
-    return Row(
+    return Column(
       children: [
-        IconButton(
-          onPressed: onPressed,
-          icon: const Icon(Icons.add),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: label,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: onPressed,
+              icon: const Icon(Icons.add),
+            ),
+          ],
         ),
+        const SizedBox(height: 20),
+        SizedBox(
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: itemList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(title: Text('${itemList[index]}'));
+                }))
       ],
     );
   }
@@ -334,7 +355,7 @@ class _FinancialPageState extends State<FinancialPage> {
     if (_expenses.text.isNotEmpty) {
       setState(() {
         _expensesItems.add(double.parse(_expenses.text));
-        _income.clear();
+        _expenses.clear();
       });
     }
   }
