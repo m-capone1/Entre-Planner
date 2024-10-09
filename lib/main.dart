@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -122,31 +123,46 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 10),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Welcome Back!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              Container(
-                padding: const EdgeInsets.all(6.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    themeNotifier.toggleTheme();
-                  },
-                  child: themeNotifier.isDarkMode
-                      ? const Icon(Icons.dark_mode)
-                      : const Icon(Icons.sunny),
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Entre-Planner',
+              style: GoogleFonts.montserrat(
+                textStyle: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
+            ),
           ),
-        ],
-      ),
+        ),
+        const Spacer(),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Welcome Back!',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Container(
+              padding: const EdgeInsets.all(6.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  themeNotifier.toggleTheme();
+                },
+                child: themeNotifier.isDarkMode
+                    ? const Icon(Icons.dark_mode)
+                    : const Icon(Icons.sunny),
+              ),
+            ),
+          ],
+        ),
+        const Spacer(),
+      ],
     );
   }
 }
