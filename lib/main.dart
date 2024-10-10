@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -371,25 +373,42 @@ class _FinancialPageState extends State<FinancialPage> {
   }
 }
 
-class AIPage extends StatelessWidget {
+class AIPage extends StatefulWidget {
   const AIPage({super.key});
+
+  @override
+  State<AIPage> createState() => _AIPageState();
+}
+
+class _AIPageState extends State<AIPage> {
+  String? response;
+
+  Future<void> _getResponse() async {
+    String newResponse = await getOpenAIResponse(
+      'Recommend 3 tips for a new entrepreneur.',
+    );
+    setState(() {
+      response = newResponse;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AI Tips'),
+        title: const Text('AI Response'),
       ),
-      body: Column(
+      body: ListView(
         children: [
           ElevatedButton(
-            onPressed: () async {
-              String response = await getOpenAIResponse(
-                  'Recommend 3 tips for a new entrepreneur.');
-              print(response);
-            },
+            onPressed: _getResponse,
             child: const Text('Get Response'),
           ),
+          if (response != null)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(response!),
+            ),
         ],
       ),
     );
@@ -398,8 +417,7 @@ class AIPage extends StatelessWidget {
 
 Future<String> getOpenAIResponse(String prompt) async {
   final url = Uri.parse('https://api.openai.com/v1/chat/completions');
-  const apiKey =
-      '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';
+  final apiKey = dotenv.env['OPENAI_API_KEY'];
 
   final data = {
     'model': 'gpt-4o',
@@ -409,7 +427,7 @@ Future<String> getOpenAIResponse(String prompt) async {
         'content': prompt,
       }
     ],
-    'max_tokens': 250,
+    'max_tokens': 350,
   };
 
   try {
