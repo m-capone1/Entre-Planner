@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -289,12 +291,14 @@ class _FinancialPageState extends State<FinancialPage> {
           label: 'Enter Income',
           controller: _income,
           onPressed: _addIncome,
+          itemList: _incomeItems,
         ),
         const Text('Expenses'),
         _buildRow(
           label: 'Enter Expenses',
           controller: _expenses,
           onPressed: _addExpenses,
+          itemList: _expensesItems,
         ),
         const SizedBox(height: 20),
         const Text('Net Profit'),
@@ -337,7 +341,7 @@ class _FinancialPageState extends State<FinancialPage> {
                 itemCount: itemList.length,
                 itemBuilder: (context, index) {
                   return ListTile(title: Text('${itemList[index]}'));
-                }))
+                })),
       ],
     );
   }
@@ -372,8 +376,59 @@ class AIPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const [],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('AI Tips'),
+      ),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () async {
+              String response = await getOpenAIResponse(
+                  'Recommend 3 tips for a new entrepreneur.');
+              print(response);
+            },
+            child: const Text('Get Response'),
+          ),
+        ],
+      ),
     );
+  }
+}
+
+Future<String> getOpenAIResponse(String prompt) async {
+  final url = Uri.parse('https://api.openai.com/v1/chat/completions');
+  const apiKey =
+      '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';
+
+  final data = {
+    'model': 'gpt-4o',
+    'messages': [
+      {
+        'role': 'user',
+        'content': prompt,
+      }
+    ],
+    'max_tokens': 250,
+  };
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      return responseData['choices'][0]['message']['content'];
+    } else {
+      return 'Error: ${response.statusCode} - ${response.reasonPhrase}';
+    }
+  } catch (error) {
+    return 'Failed to get response: $error';
   }
 }
